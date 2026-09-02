@@ -1,0 +1,4 @@
+# Pinned so a reader reproduces the same instrument, not a similar one.
+# Phase 1 (mock server + harness + validation) needs only aiohttp.
+# Analysis dependencies (phase 2) are added to this file when phase 2 lands.
+aiohttp==3.9.5

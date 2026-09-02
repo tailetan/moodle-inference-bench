@@ -1,0 +1,13 @@
+# The scripts and the harness run under WSL2 / Linux. Without this, a clone on
+# Windows with core.autocrlf=true gets CRLF line endings and every shell script
+# fails with "bad interpreter".
+* text=auto eol=lf
+*.sh text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+Makefile text eol=lf
+
+# Results CSVs are left exactly as the harness wrote them. Python's csv module
+# emits RFC 4180 CRLF line endings; normalising those would make every file
+# show as modified the moment a run is repeated.
+*.csv -text
