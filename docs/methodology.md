@@ -45,6 +45,10 @@ The study splits into two independent arms with different constraints. Keeping t
 
 **Arm A carries the full concurrency ladder** precisely because there is no model. The mock returns on a timer, so fifty simultaneous requests cost almost nothing. This means the load-related part of Q1, whether Moodle's overhead grows under concurrency, is fully answerable on a laptop. That was not obvious and it is the reason this study survives the loss of a GPU.
 
+> **Amended 2 September 2026.** The full ladder was measured against real
+> Moodle and the host runs out of CPU above concurrency 5, so only the lower
+> range yields an overhead figure. See revision R2.
+
 **Arm B is deliberately shallow on concurrency.** CPU inference does not batch the way GPU serving does, so concurrency beyond a handful measures thread contention rather than anything useful. Arm B answers a viability question, not a scaling one.
 
 ## 3. Success criteria
@@ -412,3 +416,65 @@ definitionally a question about Moodle, and core shipping a configurable Ollama
 provider means "Moodle against a local CPU model" is now a supported
 configuration a site administrator can enable today. Whether it is usable without
 a GPU is exactly Q2, and it remains unpublished.
+
+
+### R2. The Arm A concurrency ladder does not fit this machine
+
+*2 September 2026. Amends sections 2, 6 and 13. Prompted by measuring the
+ladder against real Moodle rather than assuming it would run.*
+
+**What was measured.** `scripts/measure_ceiling.py` drives Moodle's benchmark
+endpoint through the study's own harness, against the deterministic mock, with
+`PHP_CLI_SERVER_WORKERS=64`. Raw output:
+[`../results/raw/moodle_ceiling.json`](../results/raw/moodle_ceiling.json).
+
+| Concurrency | t1 p50 | t1 p95 | t1 - t2 p50 | t1 - t2 p95 | harness wall p50 | wall p95 |
+|---|---|---|---|---|---|---|
+| 1 | 422.9 | 429.4 | 9.15 | 14.99 | 451.6 | 476.1 |
+| 2 | 421.6 | 427.3 | 8.31 | 13.02 | 447.8 | 462.6 |
+| 5 | 419.9 | 428.4 | 6.71 | 14.18 | 440.1 | 465.9 |
+| 10 | 460.6 | 672.3 | 35.57 | 168.66 | 583.4 | 1225.5 |
+| 20 | 506.3 | 757.6 | 81.24 | 335.54 | 1142.1 | 2683.5 |
+| 50 | 510.5 | 660.7 | 85.53 | 217.26 | 6544.5 | 13237.2 |
+
+All figures in milliseconds. Error rate was zero at every level.
+
+**The cause is CPU exhaustion, not the web server.** Sampling `/proc/stat`
+during a concurrency-20 run gives **96.9% CPU busy at the median across 4
+cores**. The guest has 4 processors, so at concurrency 10 and above the machine
+has no idle capacity left. Raising the worker count cannot help, and neither
+would moving to php-fpm: the bottleneck is compute, not the request model. This
+also corrects the reading of spike 2, which measured a PHP script that only
+slept and therefore never exercised the CPU.
+
+**Why this matters more than a performance disappointment.** The `t1 - t2`
+column rises from about 7 ms to about 85 ms across the ladder. Read naively,
+that is prediction 2 confirmed: overhead grows with concurrency. It is not.
+Above concurrency 5 the machine is CPU-starved, so the rise measures PHP and
+PostgreSQL competing for cores, not Moodle's AI subsystem doing more work.
+Reporting it as subsystem overhead would be the study's central claim built on
+an artefact.
+
+**The change.** Arm A's ladder is split into two ranges, and only the first
+produces an overhead figure:
+
+| Range | Concurrency | Status |
+|---|---|---|
+| Measured | 1, 2, 5 | CPU has headroom. `t1 - t2` here is attributable to Moodle. |
+| Reported as saturated | 10, 20, 50 | Host CPU-bound. Latency is reported, but **not** as subsystem overhead. |
+
+The upper range is still run and still published, because "this laptop cannot
+serve ten concurrent AI requests" is a real and useful finding about commodity
+hardware. It is reported as a capacity result, not as an overhead result.
+
+**Section 13 gains a threat.** The original list says results describe one CPU
+under one thermal design. It must also say that the concurrency range over which
+subsystem overhead can be measured at all is bounded by that CPU, and that the
+bound here is roughly 5 concurrent requests on 4 available cores.
+
+**What could raise the bound.** The host has 12 logical processors; the guest is
+given 4 by `processors=4` in `.wslconfig`. Raising that is the only lever likely
+to move the measured range, and it requires a full WSL restart. If it is raised,
+`docs/machine-profile.md` must be re-recorded and this revision amended with the
+new measured bound. Prediction 2 cannot be honestly tested until the ladder runs
+on a host with idle CPU at the top of it.

@@ -195,6 +195,12 @@ class RunConfig:
     # Forces the mock to answer with this HTTP status, so the status and
     # error_type columns can be exercised without waiting for a real fault.
     mock_force_status: int = None
+    # "backend" drives an OpenAI-compatible endpoint directly. "moodle" drives
+    # Moodle's benchmark endpoint, which is the only way to obtain a T1 that
+    # means what the methodology says it means. See issue_request.
+    target: str = "backend"
+    bench_token: str = ""
+    action: str = "summarise_text"
     # Saturation thresholds. Crossing one of these fails the run loudly rather
     # than quietly reporting the harness's own ceiling as the system's.
     max_dispatch_lag_p99_ms: float = 25.0
@@ -211,6 +217,9 @@ class RunResult:
     config: RunConfig
     rows: list = field(default_factory=list)
     dispatch_lag_ms: list = field(default_factory=list)
+    # Wall time the harness saw per request. In moodle mode this is a different
+    # quantity from t1 and is kept out of the results schema on purpose.
+    harness_wall_ms: list = field(default_factory=list)
     loop_lag_ms: list = field(default_factory=list)
     mock_actual_ttft_ms: list = field(default_factory=list)
     mock_actual_total_ms: list = field(default_factory=list)
@@ -270,6 +279,20 @@ def _request_headers(cfg):
     if cfg.mock_force_status is not None:
         headers["X-Mock-Force-Status"] = str(int(cfg.mock_force_status))
     return headers
+
+
+def _moodle_headers(cfg):
+    return {
+        "Content-Type": "application/json",
+        "X-Bench-Token": cfg.bench_token,
+    }
+
+
+def _moodle_payload(cfg):
+    return {
+        "action": cfg.action,
+        "prompttext": SYNTHETIC_PROMPT,
+    }
 
 
 def _payload(cfg):
@@ -375,6 +398,91 @@ def _record_mock_report(result, mock_report):
             bucket.append(value)
 
 
+async def issue_moodle_request(session, cfg, scheduled_at, scheduled_wall, result):
+    """Drive Moodle's benchmark endpoint and record what Moodle reports.
+
+    The important difference from the direct path: t1 and t2 are **not**
+    measured by the harness here. They are measured inside Moodle, around the
+    core AI manager call and around the provider's HTTP send respectively, and
+    reported back in the response body.
+
+    That is the whole point. The methodology puts T1 at the core AI manager, and
+    a wall-clock time taken out here would also contain web-server queueing,
+    which grows with load. Attributing that to Moodle's AI subsystem would
+    manufacture the study's own prediction 2 out of nothing. The harness's wall
+    clock is still recorded, but as run-level metadata answering a different
+    question, not as t1.
+    """
+    loop = asyncio.get_running_loop()
+    row = _blank_row(cfg, scheduled_wall)
+
+    dispatch_at = loop.time()
+    arrival_offset_ms = (dispatch_at - scheduled_at) * 1000.0
+    result.dispatch_lag_ms.append(arrival_offset_ms)
+    row["arrival_offset_ms"] = round(arrival_offset_ms, 3)
+
+    status = "ok"
+    error_type = ""
+    body = None
+
+    wall_start = time.perf_counter()
+    try:
+        async with session.post(
+            cfg.url,
+            json=_moodle_payload(cfg),
+            headers=_moodle_headers(cfg),
+        ) as response:
+            text = await response.text()
+            if response.status != 200:
+                status = "error"
+                error_type = "http_%d" % response.status
+            else:
+                try:
+                    body = json.loads(text)
+                except json.JSONDecodeError:
+                    # bench.php always answers with JSON, including on failure.
+                    # HTML here means Moodle rendered an error page, which the
+                    # harness must not silently record as a bad measurement.
+                    status = "error"
+                    error_type = "non_json_response"
+    except asyncio.TimeoutError:
+        status = "timeout"
+        error_type = "timeout"
+    except aiohttp.ClientError as exc:
+        status = "error"
+        error_type = type(exc).__name__
+    except Exception as exc:  # pragma: no cover - defensive
+        status = "error"
+        error_type = type(exc).__name__
+
+    wall_ms = (time.perf_counter() - wall_start) * 1000.0
+    result.harness_wall_ms.append(wall_ms)
+
+    if body is not None:
+        if not body.get("success"):
+            status = "error"
+            error_type = str(body.get("errorcode") or body.get("error") or "moodle_error")
+            if body.get("backend_error_type"):
+                error_type = body["backend_error_type"]
+        row["t1_total_ms"] = body.get("t1_total_ms", "")
+        row["t2_model_ms"] = body.get("t2_model_ms")
+        if row["t2_model_ms"] is None:
+            row["t2_model_ms"] = ""
+        row["input_tokens"] = body.get("input_tokens") or ""
+        if status == "ok":
+            row["output_tokens"] = body.get("output_tokens") or 0
+
+    row["status"] = status
+    row["error_type"] = error_type
+    if status != "ok":
+        row["output_tokens"] = 0
+
+    # ttft_ms and tokens_per_sec stay empty. Moodle's providers are
+    # non-streaming, so there is no first-token event and no decode window to
+    # observe on this path.
+    result.rows.append(row)
+
+
 async def issue_request(session, cfg, scheduled_at, scheduled_wall, result):
     """Perform one request and append exactly one CSV row."""
     loop = asyncio.get_running_loop()
@@ -477,11 +585,14 @@ async def _warmup(session, cfg):
     """
     for _ in range(cfg.warmup_requests):
         try:
-            async with session.post(
-                cfg.url.rstrip("/") + "/v1/chat/completions",
-                json=_payload(cfg),
-                headers=_request_headers(cfg),
-            ) as response:
+            if cfg.target == "moodle":
+                url, payload, headers = (
+                    cfg.url, _moodle_payload(cfg), _moodle_headers(cfg))
+            else:
+                url, payload, headers = (
+                    cfg.url.rstrip("/") + "/v1/chat/completions",
+                    _payload(cfg), _request_headers(cfg))
+            async with session.post(url, json=payload, headers=headers) as response:
                 await response.read()
         except Exception:
             pass
@@ -507,6 +618,7 @@ async def run_load(cfg):
         await _warmup(session, cfg)
 
         loop = asyncio.get_running_loop()
+        issue = issue_moodle_request if cfg.target == "moodle" else issue_request
         monitor.start()
 
         start_loop = loop.time() + cfg.lead_in_s
@@ -517,7 +629,7 @@ async def run_load(cfg):
             now = loop.time()
             if scheduled_at > now:
                 await asyncio.sleep(scheduled_at - now)
-            tasks.append(asyncio.ensure_future(issue_request(
+            tasks.append(asyncio.ensure_future(issue(
                 session, cfg, scheduled_at, start_wall + offset, result)))
 
         dispatch_done = loop.time()
@@ -623,7 +735,9 @@ def build_meta(result):
         "config_id": cfg.config_id,
         "arm": cfg.arm,
         "url": cfg.url,
-        "stream": cfg.stream,
+        "target": cfg.target,
+        "action": cfg.action if cfg.target == "moodle" else None,
+        "stream": cfg.stream if cfg.target == "backend" else False,
         "seed": cfg.seed,
         "concurrency_target": cfg.concurrency_target,
         "target_rate_per_s": cfg.rate,
@@ -647,6 +761,10 @@ def build_meta(result):
         },
         "instrument": {
             "dispatch_lag_ms": summarise(result.dispatch_lag_ms),
+            # In moodle mode this is deliberately not t1. It is the harness's
+            # own view, which includes web-server queueing, and it is kept here
+            # rather than in the results schema so the two cannot be confused.
+            "harness_wall_ms": summarise(result.harness_wall_ms),
             "event_loop_lag_ms": summarise(result.loop_lag_ms),
             "saturated": result.saturated,
             "saturation_reasons": result.saturation_reasons,
@@ -691,7 +809,18 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description="Open-loop Poisson load generator with dual t1/t2 timing.")
     parser.add_argument("--url", default="http://127.0.0.1:8090",
-                        help="base URL of the OpenAI-compatible endpoint")
+                        help="base URL of the OpenAI-compatible endpoint, or "
+                             "the full bench.php URL when --target moodle")
+    parser.add_argument("--target", choices=["backend", "moodle"],
+                        default="backend",
+                        help="backend drives an OpenAI-compatible endpoint "
+                             "directly; moodle drives Moodle's benchmark "
+                             "endpoint and takes t1 and t2 from its response")
+    parser.add_argument("--bench-token", default="",
+                        help="X-Bench-Token value, required with --target moodle")
+    parser.add_argument("--action", default="summarise_text",
+                        choices=["summarise_text", "generate_text", "explain_text"],
+                        help="Moodle AI action to invoke with --target moodle")
     parser.add_argument("--arm", default="A")
     parser.add_argument("--config-id", default="adhoc")
     parser.add_argument("--run-id", default="")
@@ -742,6 +871,10 @@ def parse_args(argv=None):
 
 
 def config_from_args(args):
+    if args.target == "moodle" and not args.bench_token:
+        raise SystemExit(
+            "--target moodle requires --bench-token. The benchmark endpoint "
+            "refuses every request without it.")
     if args.concurrency is not None:
         if not args.expected_latency_ms:
             raise SystemExit("--concurrency requires --expected-latency-ms")
@@ -774,6 +907,9 @@ def config_from_args(args):
         mock_force_status=args.mock_force_status,
         max_dispatch_lag_p99_ms=args.max_dispatch_lag_p99_ms,
         max_loop_lag_p99_ms=args.max_loop_lag_p99_ms,
+        target=args.target,
+        bench_token=args.bench_token,
+        action=args.action,
         max_dispatch_lag_max_ms=args.max_dispatch_lag_max_ms,
         max_schedule_sigma=args.max_schedule_sigma,
         out_csv=args.out,

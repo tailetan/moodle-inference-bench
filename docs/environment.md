@@ -192,3 +192,39 @@ vendor/bin/phpunit --testsuite aiprovider_edgellm_testsuite
 
 26 tests, 77 assertions, all passing on Moodle 5.2.2+, PHP 8.3.30 and PostgreSQL
 16.13.
+
+## Measured again, with real Moodle in the path
+
+Spike 2 measured a PHP script that only slept. That was misleading, and this
+supersedes it. `scripts/measure_ceiling.py` drives Moodle's own benchmark
+endpoint through the study's harness at `PHP_CLI_SERVER_WORKERS=64`. Raw output:
+[`../results/raw/moodle_ceiling.json`](../results/raw/moodle_ceiling.json).
+
+| Concurrency | t1 p50 | t1 - t2 p50 | t1 - t2 p95 | harness wall p50 |
+|---|---|---|---|---|
+| 1 | 422.9 | 9.15 | 14.99 | 451.6 |
+| 2 | 421.6 | 8.31 | 13.02 | 447.8 |
+| 5 | 419.9 | 6.71 | 14.18 | 440.1 |
+| 10 | 460.6 | 35.57 | 168.66 | 583.4 |
+| 20 | 506.3 | 81.24 | 335.54 | 1142.1 |
+| 50 | 510.5 | 85.53 | 217.26 | 6544.5 |
+
+Milliseconds. Zero errors throughout.
+
+**The bottleneck is CPU, not the web server.** Sampling `/proc/stat` during a
+concurrency-20 run gives **96.9% busy at the median across the guest's 4 cores**.
+Above concurrency 5 there is no idle capacity, so raising the worker count
+cannot help and neither would php-fpm. The earlier conclusion that raising
+workers would clear the ceiling was drawn from an endpoint that never used the
+CPU, and is wrong for real Moodle.
+
+**This is why the decision matters.** `t1 - t2` climbs from about 7 ms to about
+85 ms across the ladder, which reads exactly like the study's prediction 2
+coming true. It is not: above concurrency 5 that rise is PHP and PostgreSQL
+competing for cores. Reporting it as subsystem overhead would build the study's
+central claim on an artefact. Methodology revision R2 splits the ladder for this
+reason.
+
+The only lever likely to move the bound is `processors` in `.wslconfig`, which
+gives the guest 4 of the host's 12 logical processors. Raising it needs a full
+WSL restart, and the machine profile must be re-recorded if it changes.

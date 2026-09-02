@@ -17,7 +17,7 @@ the specification. Code that would contradict it does not get written.
 
 ## Status
 
-**Phases 1, 2 and 3 complete. Phases 4, 5 and 6 not started.**
+**Phases 1 to 4 complete. Phases 5 and 6 not started.**
 
 No study result exists yet. Read that sentence literally -- there is no model
 anywhere, no prompt corpus, and no figure for Moodle's subsystem overhead. What
@@ -33,7 +33,7 @@ no repeats, no concurrency ladder, no machine controls, no percentiles.
 | 1 | Harness and instrument validation | Done |
 | 2 | Analysis and plotting | Done |
 | 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Done |
-| 4 | Environment wiring (native, no Docker) | Not started |
+| 4 | Environment wiring (native, no Docker) | Done |
 | 5 | Prompt corpus | Not started |
 | 6 | Arm A execution | Not started |
 | -- | Arm B (CPU inference viability) | Deliberately last |
@@ -92,7 +92,8 @@ and it would hide exactly the queueing this study exists to detect.
 ## Quick start
 
 Four commands, from a Linux shell (WSL2 on this machine -- see
-[`docs/machine-profile.md`](docs/machine-profile.md)):
+[`docs/machine-profile.md`](docs/machine-profile.md)). This needs no Moodle and
+no model:
 
 ```bash
 git clone <this repo> && cd moodle-inference-bench
@@ -104,6 +105,28 @@ git clone <this repo> && cd moodle-inference-bench
 The last command is the phase 1 deliverable: it starts the mock, drives the
 harness at every concurrency level in both streaming and non-streaming mode, and
 reports pass or fail per level.
+
+### Driving Moodle
+
+Four more, once a Moodle checkout exists. `make env` writes `.env`, which is the
+only file to edit -- one line in it repoints the whole study between the mock, a
+llama.cpp server, Ollama and a commercial API.
+
+```bash
+make env                # then edit .env: MOODLE_ROOT and BACKEND_ENDPOINT
+make sync-plugin        # copy the plugin in and run Moodle's upgrade
+make serve              # Moodle dev server with the benchmark worker count
+make bench-setup        # point Moodle at the backend; prints a token for .env
+```
+
+`make bench-setup` widens Moodle's cURL security so a local endpoint is
+reachable at all, creates the provider instances and opens the benchmark
+endpoint. It records the **exact prior value** of everything it touches, so
+`make bench-teardown` restores what was there rather than what the defaults
+happen to be -- including unsetting a setting that had never been set.
+
+**Run `make bench-teardown` when a run finishes.** Leaving it up leaves a way to
+execute AI actions over HTTP and leaves the site's SSRF protection widened.
 
 The mock server defaults to port 8090, not 8080: WSL2 runs every distribution in
 one network namespace, and a Moodle dev server commonly holds 8080.
@@ -295,6 +318,44 @@ checks in total, including the repeat-variance alarm in both directions -- it
 has never fired on real data, and an alarm nobody has tested is not an alarm.
 
 Run it with `make analyse` and `make test-analyse`.
+
+## Phase 4: the environment, and what it revealed
+
+There is no Docker. Moodle 5.2, PHP 8.3 and PostgreSQL run natively, which
+removes a container layer from between the harness and the thing being measured.
+[`docs/environment.md`](docs/environment.md) records the setup.
+
+The substantive result of this phase was a measurement, not a script.
+`scripts/measure_ceiling.py` drives Moodle's benchmark endpoint through the
+study's own harness and walks the Arm A ladder:
+
+| Concurrency | t1 p50 | t1 - t2 p50 | t1 - t2 p95 | harness wall p50 |
+|---|---|---|---|---|
+| 1 | 422.9 | 9.15 | 14.99 | 451.6 |
+| 2 | 421.6 | 8.31 | 13.02 | 447.8 |
+| 5 | 419.9 | 6.71 | 14.18 | 440.1 |
+| 10 | 460.6 | 35.57 | 168.66 | 583.4 |
+| 20 | 506.3 | 81.24 | 335.54 | 1142.1 |
+| 50 | 510.5 | 85.53 | 217.26 | 6544.5 |
+
+Milliseconds, zero errors throughout.
+
+`t1 - t2` climbing from 7 ms to 85 ms looks exactly like the study's prediction 2
+confirmed. **It is not.** Sampling `/proc/stat` during a concurrency-20 run gives
+96.9% CPU busy at the median across the guest's 4 cores: above concurrency 5 the
+machine has no idle capacity, so that rise is PHP and PostgreSQL competing for
+cores rather than Moodle's AI subsystem doing more work.
+
+This also corrects the earlier conclusion from the trivial-endpoint spike, which
+suggested raising the worker count would clear the ceiling. That endpoint only
+slept, so it never used the CPU. With real Moodle, more workers cannot help and
+neither would php-fpm.
+
+Methodology revision R2 splits the ladder in response: 1, 2 and 5 yield an
+overhead figure; 10, 20 and 50 are still run and published, but as a capacity
+result rather than an overhead one. **Prediction 2 cannot be honestly tested on
+this machine as configured**, and saying so is more useful than reporting an
+artefact that happens to agree with it.
 
 ## Standards this repo holds itself to
 
