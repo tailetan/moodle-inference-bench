@@ -1,0 +1,1184 @@
+{
+  "sources": [
+    "results/raw/validation/validate-json-c1.csv",
+    "results/raw/validation/validate-json-c10.csv",
+    "results/raw/validation/validate-json-c2.csv",
+    "results/raw/validation/validate-json-c20.csv",
+    "results/raw/validation/validate-json-c5.csv",
+    "results/raw/validation/validate-json-c50.csv",
+    "results/raw/validation/validate-stream-c1.csv",
+    "results/raw/validation/validate-stream-c10.csv",
+    "results/raw/validation/validate-stream-c2.csv",
+    "results/raw/validation/validate-stream-c20.csv",
+    "results/raw/validation/validate-stream-c5.csv",
+    "results/raw/validation/validate-stream-c50.csv"
+  ],
+  "requests": 12814,
+  "repeat_variance_threshold_pct": 10.0,
+  "configurations": [
+    {
+      "config_id": "validate-json-c1",
+      "series": "validate-json",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 1,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-json-c1",
+          "source": "validate-json-c1.csv",
+          "summary": {
+            "requests": 79,
+            "requests_ok": 79,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 79,
+              "min": 413.674,
+              "p50": 415.262,
+              "p95": 417.6895,
+              "p99": 419.56516,
+              "max": 424.93
+            },
+            "backend_ms": {
+              "n": 79,
+              "min": 412.905,
+              "p50": 414.16,
+              "p95": 416.1891,
+              "p99": 416.71352,
+              "max": 417.116
+            },
+            "ttft_ms": null,
+            "overhead_ms": {
+              "n": 79,
+              "min": 0.39800000000002456,
+              "p50": 0.9949999999999477,
+              "p95": 1.547399999999993,
+              "p99": 3.5165199999999803,
+              "max": 8.677000000000021
+            },
+            "tokens_per_sec_median": null,
+            "tokens_per_sec_mean": null,
+            "e2e_p50_ms": 415.262,
+            "e2e_p95_ms": 417.6895,
+            "overhead_p95_ms": 1.547399999999993
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 79,
+        "requests_ok": 79,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 79,
+          "min": 413.674,
+          "p50": 415.262,
+          "p95": 417.6895,
+          "p99": 419.56516,
+          "max": 424.93
+        },
+        "backend_ms": {
+          "n": 79,
+          "min": 412.905,
+          "p50": 414.16,
+          "p95": 416.1891,
+          "p99": 416.71352,
+          "max": 417.116
+        },
+        "ttft_ms": null,
+        "overhead_ms": {
+          "n": 79,
+          "min": 0.39800000000002456,
+          "p50": 0.9949999999999477,
+          "p95": 1.547399999999993,
+          "p99": 3.5165199999999803,
+          "max": 8.677000000000021
+        },
+        "tokens_per_sec_median": null,
+        "tokens_per_sec_mean": null,
+        "e2e_p50_ms": 415.262,
+        "e2e_p95_ms": 417.6895,
+        "overhead_p95_ms": 1.547399999999993
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-json-c2",
+      "series": "validate-json",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 2,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-json-c2",
+          "source": "validate-json-c2.csv",
+          "summary": {
+            "requests": 160,
+            "requests_ok": 160,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 160,
+              "min": 412.636,
+              "p50": 415.8635,
+              "p95": 418.20529999999997,
+              "p99": 422.0689,
+              "max": 432.462
+            },
+            "backend_ms": {
+              "n": 160,
+              "min": 411.72,
+              "p50": 414.5935,
+              "p95": 416.77049999999997,
+              "p99": 420.81602000000004,
+              "max": 431.185
+            },
+            "ttft_ms": null,
+            "overhead_ms": {
+              "n": 160,
+              "min": 0.2489999999999668,
+              "p50": 1.1434999999999889,
+              "p95": 1.8118999999999705,
+              "p99": 2.2375299999999956,
+              "max": 2.258000000000038
+            },
+            "tokens_per_sec_median": null,
+            "tokens_per_sec_mean": null,
+            "e2e_p50_ms": 415.8635,
+            "e2e_p95_ms": 418.20529999999997,
+            "overhead_p95_ms": 1.8118999999999705
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 160,
+        "requests_ok": 160,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 160,
+          "min": 412.636,
+          "p50": 415.8635,
+          "p95": 418.20529999999997,
+          "p99": 422.0689,
+          "max": 432.462
+        },
+        "backend_ms": {
+          "n": 160,
+          "min": 411.72,
+          "p50": 414.5935,
+          "p95": 416.77049999999997,
+          "p99": 420.81602000000004,
+          "max": 431.185
+        },
+        "ttft_ms": null,
+        "overhead_ms": {
+          "n": 160,
+          "min": 0.2489999999999668,
+          "p50": 1.1434999999999889,
+          "p95": 1.8118999999999705,
+          "p99": 2.2375299999999956,
+          "max": 2.258000000000038
+        },
+        "tokens_per_sec_median": null,
+        "tokens_per_sec_mean": null,
+        "e2e_p50_ms": 415.8635,
+        "e2e_p95_ms": 418.20529999999997,
+        "overhead_p95_ms": 1.8118999999999705
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-json-c5",
+      "series": "validate-json",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 5,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-json-c5",
+          "source": "validate-json-c5.csv",
+          "summary": {
+            "requests": 364,
+            "requests_ok": 364,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 364,
+              "min": 412.565,
+              "p50": 414.895,
+              "p95": 417.25065,
+              "p99": 418.70423,
+              "max": 421.731
+            },
+            "backend_ms": {
+              "n": 364,
+              "min": 412.071,
+              "p50": 413.8835,
+              "p95": 415.75385,
+              "p99": 417.38796,
+              "max": 419.697
+            },
+            "ttft_ms": null,
+            "overhead_ms": {
+              "n": 364,
+              "min": 0.13299999999998136,
+              "p50": 1.078000000000003,
+              "p95": 1.7832000000000245,
+              "p99": 2.291500000000003,
+              "max": 3.76400000000001
+            },
+            "tokens_per_sec_median": null,
+            "tokens_per_sec_mean": null,
+            "e2e_p50_ms": 414.895,
+            "e2e_p95_ms": 417.25065,
+            "overhead_p95_ms": 1.7832000000000245
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 364,
+        "requests_ok": 364,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 364,
+          "min": 412.565,
+          "p50": 414.895,
+          "p95": 417.25065,
+          "p99": 418.70423,
+          "max": 421.731
+        },
+        "backend_ms": {
+          "n": 364,
+          "min": 412.071,
+          "p50": 413.8835,
+          "p95": 415.75385,
+          "p99": 417.38796,
+          "max": 419.697
+        },
+        "ttft_ms": null,
+        "overhead_ms": {
+          "n": 364,
+          "min": 0.13299999999998136,
+          "p50": 1.078000000000003,
+          "p95": 1.7832000000000245,
+          "p99": 2.291500000000003,
+          "max": 3.76400000000001
+        },
+        "tokens_per_sec_median": null,
+        "tokens_per_sec_mean": null,
+        "e2e_p50_ms": 414.895,
+        "e2e_p95_ms": 417.25065,
+        "overhead_p95_ms": 1.7832000000000245
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-json-c10",
+      "series": "validate-json",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 10,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-json-c10",
+          "source": "validate-json-c10.csv",
+          "summary": {
+            "requests": 731,
+            "requests_ok": 731,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 731,
+              "min": 412.132,
+              "p50": 415.141,
+              "p95": 416.9635,
+              "p99": 418.29019999999997,
+              "max": 420.839
+            },
+            "backend_ms": {
+              "n": 731,
+              "min": 411.934,
+              "p50": 414.078,
+              "p95": 415.6535,
+              "p99": 416.2492,
+              "max": 419.604
+            },
+            "ttft_ms": null,
+            "overhead_ms": {
+              "n": 731,
+              "min": 0.16300000000001091,
+              "p50": 1.085999999999956,
+              "p95": 1.7779999999999916,
+              "p99": 2.2456000000000165,
+              "max": 4.5919999999999845
+            },
+            "tokens_per_sec_median": null,
+            "tokens_per_sec_mean": null,
+            "e2e_p50_ms": 415.141,
+            "e2e_p95_ms": 416.9635,
+            "overhead_p95_ms": 1.7779999999999916
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 731,
+        "requests_ok": 731,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 731,
+          "min": 412.132,
+          "p50": 415.141,
+          "p95": 416.9635,
+          "p99": 418.29019999999997,
+          "max": 420.839
+        },
+        "backend_ms": {
+          "n": 731,
+          "min": 411.934,
+          "p50": 414.078,
+          "p95": 415.6535,
+          "p99": 416.2492,
+          "max": 419.604
+        },
+        "ttft_ms": null,
+        "overhead_ms": {
+          "n": 731,
+          "min": 0.16300000000001091,
+          "p50": 1.085999999999956,
+          "p95": 1.7779999999999916,
+          "p99": 2.2456000000000165,
+          "max": 4.5919999999999845
+        },
+        "tokens_per_sec_median": null,
+        "tokens_per_sec_mean": null,
+        "e2e_p50_ms": 415.141,
+        "e2e_p95_ms": 416.9635,
+        "overhead_p95_ms": 1.7779999999999916
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-json-c20",
+      "series": "validate-json",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 20,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-json-c20",
+          "source": "validate-json-c20.csv",
+          "summary": {
+            "requests": 1432,
+            "requests_ok": 1432,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 1432,
+              "min": 411.869,
+              "p50": 414.89750000000004,
+              "p95": 416.78135,
+              "p99": 417.63571,
+              "max": 422.631
+            },
+            "backend_ms": {
+              "n": 1432,
+              "min": 411.561,
+              "p50": 413.818,
+              "p95": 415.35045,
+              "p99": 416.35086,
+              "max": 419.162
+            },
+            "ttft_ms": null,
+            "overhead_ms": {
+              "n": 1432,
+              "min": 0.09600000000000364,
+              "p50": 1.0504999999999995,
+              "p95": 1.7603500000000083,
+              "p99": 2.223380000000004,
+              "max": 9.240999999999985
+            },
+            "tokens_per_sec_median": null,
+            "tokens_per_sec_mean": null,
+            "e2e_p50_ms": 414.89750000000004,
+            "e2e_p95_ms": 416.78135,
+            "overhead_p95_ms": 1.7603500000000083
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 1432,
+        "requests_ok": 1432,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 1432,
+          "min": 411.869,
+          "p50": 414.89750000000004,
+          "p95": 416.78135,
+          "p99": 417.63571,
+          "max": 422.631
+        },
+        "backend_ms": {
+          "n": 1432,
+          "min": 411.561,
+          "p50": 413.818,
+          "p95": 415.35045,
+          "p99": 416.35086,
+          "max": 419.162
+        },
+        "ttft_ms": null,
+        "overhead_ms": {
+          "n": 1432,
+          "min": 0.09600000000000364,
+          "p50": 1.0504999999999995,
+          "p95": 1.7603500000000083,
+          "p99": 2.223380000000004,
+          "max": 9.240999999999985
+        },
+        "tokens_per_sec_median": null,
+        "tokens_per_sec_mean": null,
+        "e2e_p50_ms": 414.89750000000004,
+        "e2e_p95_ms": 416.78135,
+        "overhead_p95_ms": 1.7603500000000083
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-json-c50",
+      "series": "validate-json",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 50,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-json-c50",
+          "source": "validate-json-c50.csv",
+          "summary": {
+            "requests": 3641,
+            "requests_ok": 3641,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 3641,
+              "min": 411.155,
+              "p50": 414.363,
+              "p95": 416.588,
+              "p99": 418.323,
+              "max": 430.001
+            },
+            "backend_ms": {
+              "n": 3641,
+              "min": 411.039,
+              "p50": 413.355,
+              "p95": 415.218,
+              "p99": 416.7468,
+              "max": 428.894
+            },
+            "ttft_ms": null,
+            "overhead_ms": {
+              "n": 3641,
+              "min": 0.07900000000000773,
+              "p50": 0.9949999999999477,
+              "p95": 1.7630000000000337,
+              "p99": 2.6709999999999923,
+              "max": 12.295000000000016
+            },
+            "tokens_per_sec_median": null,
+            "tokens_per_sec_mean": null,
+            "e2e_p50_ms": 414.363,
+            "e2e_p95_ms": 416.588,
+            "overhead_p95_ms": 1.7630000000000337
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 3641,
+        "requests_ok": 3641,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 3641,
+          "min": 411.155,
+          "p50": 414.363,
+          "p95": 416.588,
+          "p99": 418.323,
+          "max": 430.001
+        },
+        "backend_ms": {
+          "n": 3641,
+          "min": 411.039,
+          "p50": 413.355,
+          "p95": 415.218,
+          "p99": 416.7468,
+          "max": 428.894
+        },
+        "ttft_ms": null,
+        "overhead_ms": {
+          "n": 3641,
+          "min": 0.07900000000000773,
+          "p50": 0.9949999999999477,
+          "p95": 1.7630000000000337,
+          "p99": 2.6709999999999923,
+          "max": 12.295000000000016
+        },
+        "tokens_per_sec_median": null,
+        "tokens_per_sec_mean": null,
+        "e2e_p50_ms": 414.363,
+        "e2e_p95_ms": 416.588,
+        "overhead_p95_ms": 1.7630000000000337
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-stream-c1",
+      "series": "validate-stream",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 1,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-stream-c1",
+          "source": "validate-stream-c1.csv",
+          "summary": {
+            "requests": 79,
+            "requests_ok": 79,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 79,
+              "min": 412.9,
+              "p50": 415.027,
+              "p95": 416.3892,
+              "p99": 417.21448,
+              "max": 417.709
+            },
+            "backend_ms": {
+              "n": 79,
+              "min": 412.397,
+              "p50": 413.817,
+              "p95": 415.254,
+              "p99": 415.73214,
+              "max": 415.956
+            },
+            "ttft_ms": {
+              "n": 79,
+              "min": 102.283,
+              "p50": 104.266,
+              "p95": 105.7141,
+              "p99": 106.57430000000001,
+              "max": 106.898
+            },
+            "overhead_ms": {
+              "n": 79,
+              "min": 0.25,
+              "p50": 1.0109999999999673,
+              "p95": 1.567300000000017,
+              "p99": 1.890079999999973,
+              "max": 2.0570000000000164
+            },
+            "tokens_per_sec_median": 103.007,
+            "tokens_per_sec_mean": 103.00318987341771,
+            "e2e_p50_ms": 415.027,
+            "e2e_p95_ms": 416.3892,
+            "overhead_p95_ms": 1.567300000000017
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 79,
+        "requests_ok": 79,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 79,
+          "min": 412.9,
+          "p50": 415.027,
+          "p95": 416.3892,
+          "p99": 417.21448,
+          "max": 417.709
+        },
+        "backend_ms": {
+          "n": 79,
+          "min": 412.397,
+          "p50": 413.817,
+          "p95": 415.254,
+          "p99": 415.73214,
+          "max": 415.956
+        },
+        "ttft_ms": {
+          "n": 79,
+          "min": 102.283,
+          "p50": 104.266,
+          "p95": 105.7141,
+          "p99": 106.57430000000001,
+          "max": 106.898
+        },
+        "overhead_ms": {
+          "n": 79,
+          "min": 0.25,
+          "p50": 1.0109999999999673,
+          "p95": 1.567300000000017,
+          "p99": 1.890079999999973,
+          "max": 2.0570000000000164
+        },
+        "tokens_per_sec_median": 103.007,
+        "tokens_per_sec_mean": 103.00318987341771,
+        "e2e_p50_ms": 415.027,
+        "e2e_p95_ms": 416.3892,
+        "overhead_p95_ms": 1.567300000000017
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-stream-c2",
+      "series": "validate-stream",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 2,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-stream-c2",
+          "source": "validate-stream-c2.csv",
+          "summary": {
+            "requests": 160,
+            "requests_ok": 160,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 160,
+              "min": 412.562,
+              "p50": 414.79600000000005,
+              "p95": 416.59114999999997,
+              "p99": 416.97035,
+              "max": 417.139
+            },
+            "backend_ms": {
+              "n": 160,
+              "min": 412.041,
+              "p50": 413.729,
+              "p95": 415.1691,
+              "p99": 415.51151999999996,
+              "max": 416.095
+            },
+            "ttft_ms": {
+              "n": 160,
+              "min": 102.442,
+              "p50": 104.572,
+              "p95": 105.75394999999999,
+              "p99": 106.58014,
+              "max": 106.767
+            },
+            "overhead_ms": {
+              "n": 160,
+              "min": 0.17200000000002547,
+              "p50": 1.0739999999999839,
+              "p95": 1.569750000000016,
+              "p99": 1.6846899999999891,
+              "max": 1.774000000000001
+            },
+            "tokens_per_sec_median": 103.1345,
+            "tokens_per_sec_mean": 103.11864999999997,
+            "e2e_p50_ms": 414.79600000000005,
+            "e2e_p95_ms": 416.59114999999997,
+            "overhead_p95_ms": 1.569750000000016
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 160,
+        "requests_ok": 160,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 160,
+          "min": 412.562,
+          "p50": 414.79600000000005,
+          "p95": 416.59114999999997,
+          "p99": 416.97035,
+          "max": 417.139
+        },
+        "backend_ms": {
+          "n": 160,
+          "min": 412.041,
+          "p50": 413.729,
+          "p95": 415.1691,
+          "p99": 415.51151999999996,
+          "max": 416.095
+        },
+        "ttft_ms": {
+          "n": 160,
+          "min": 102.442,
+          "p50": 104.572,
+          "p95": 105.75394999999999,
+          "p99": 106.58014,
+          "max": 106.767
+        },
+        "overhead_ms": {
+          "n": 160,
+          "min": 0.17200000000002547,
+          "p50": 1.0739999999999839,
+          "p95": 1.569750000000016,
+          "p99": 1.6846899999999891,
+          "max": 1.774000000000001
+        },
+        "tokens_per_sec_median": 103.1345,
+        "tokens_per_sec_mean": 103.11864999999997,
+        "e2e_p50_ms": 414.79600000000005,
+        "e2e_p95_ms": 416.59114999999997,
+        "overhead_p95_ms": 1.569750000000016
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-stream-c5",
+      "series": "validate-stream",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 5,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-stream-c5",
+          "source": "validate-stream-c5.csv",
+          "summary": {
+            "requests": 364,
+            "requests_ok": 364,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 364,
+              "min": 411.977,
+              "p50": 414.291,
+              "p95": 415.84735,
+              "p99": 416.51358,
+              "max": 418.27
+            },
+            "backend_ms": {
+              "n": 364,
+              "min": 411.615,
+              "p50": 413.33950000000004,
+              "p95": 414.5897,
+              "p99": 415.17746999999997,
+              "max": 416.495
+            },
+            "ttft_ms": {
+              "n": 364,
+              "min": 101.709,
+              "p50": 104.0475,
+              "p95": 105.82549999999999,
+              "p99": 106.44539,
+              "max": 107.627
+            },
+            "overhead_ms": {
+              "n": 364,
+              "min": 0.13999999999998636,
+              "p50": 0.9534999999999911,
+              "p95": 1.6260000000000248,
+              "p99": 1.9877699999999772,
+              "max": 2.4219999999999686
+            },
+            "tokens_per_sec_median": 103.16499999999999,
+            "tokens_per_sec_mean": 103.1531181318681,
+            "e2e_p50_ms": 414.291,
+            "e2e_p95_ms": 415.84735,
+            "overhead_p95_ms": 1.6260000000000248
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 364,
+        "requests_ok": 364,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 364,
+          "min": 411.977,
+          "p50": 414.291,
+          "p95": 415.84735,
+          "p99": 416.51358,
+          "max": 418.27
+        },
+        "backend_ms": {
+          "n": 364,
+          "min": 411.615,
+          "p50": 413.33950000000004,
+          "p95": 414.5897,
+          "p99": 415.17746999999997,
+          "max": 416.495
+        },
+        "ttft_ms": {
+          "n": 364,
+          "min": 101.709,
+          "p50": 104.0475,
+          "p95": 105.82549999999999,
+          "p99": 106.44539,
+          "max": 107.627
+        },
+        "overhead_ms": {
+          "n": 364,
+          "min": 0.13999999999998636,
+          "p50": 0.9534999999999911,
+          "p95": 1.6260000000000248,
+          "p99": 1.9877699999999772,
+          "max": 2.4219999999999686
+        },
+        "tokens_per_sec_median": 103.16499999999999,
+        "tokens_per_sec_mean": 103.1531181318681,
+        "e2e_p50_ms": 414.291,
+        "e2e_p95_ms": 415.84735,
+        "overhead_p95_ms": 1.6260000000000248
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-stream-c10",
+      "series": "validate-stream",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 10,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-stream-c10",
+          "source": "validate-stream-c10.csv",
+          "summary": {
+            "requests": 731,
+            "requests_ok": 731,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 731,
+              "min": 411.515,
+              "p50": 413.916,
+              "p95": 415.416,
+              "p99": 416.2779,
+              "max": 417.926
+            },
+            "backend_ms": {
+              "n": 731,
+              "min": 411.178,
+              "p50": 412.927,
+              "p95": 414.2475,
+              "p99": 414.74,
+              "max": 416.477
+            },
+            "ttft_ms": {
+              "n": 731,
+              "min": 101.414,
+              "p50": 103.667,
+              "p95": 105.174,
+              "p99": 106.11529999999999,
+              "max": 107.949
+            },
+            "overhead_ms": {
+              "n": 731,
+              "min": 0.12599999999997635,
+              "p50": 0.9140000000000441,
+              "p95": 1.657999999999987,
+              "p99": 1.9934000000000254,
+              "max": 3.637999999999977
+            },
+            "tokens_per_sec_median": 103.154,
+            "tokens_per_sec_mean": 103.15723666210661,
+            "e2e_p50_ms": 413.916,
+            "e2e_p95_ms": 415.416,
+            "overhead_p95_ms": 1.657999999999987
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 731,
+        "requests_ok": 731,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 731,
+          "min": 411.515,
+          "p50": 413.916,
+          "p95": 415.416,
+          "p99": 416.2779,
+          "max": 417.926
+        },
+        "backend_ms": {
+          "n": 731,
+          "min": 411.178,
+          "p50": 412.927,
+          "p95": 414.2475,
+          "p99": 414.74,
+          "max": 416.477
+        },
+        "ttft_ms": {
+          "n": 731,
+          "min": 101.414,
+          "p50": 103.667,
+          "p95": 105.174,
+          "p99": 106.11529999999999,
+          "max": 107.949
+        },
+        "overhead_ms": {
+          "n": 731,
+          "min": 0.12599999999997635,
+          "p50": 0.9140000000000441,
+          "p95": 1.657999999999987,
+          "p99": 1.9934000000000254,
+          "max": 3.637999999999977
+        },
+        "tokens_per_sec_median": 103.154,
+        "tokens_per_sec_mean": 103.15723666210661,
+        "e2e_p50_ms": 413.916,
+        "e2e_p95_ms": 415.416,
+        "overhead_p95_ms": 1.657999999999987
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-stream-c20",
+      "series": "validate-stream",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 20,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-stream-c20",
+          "source": "validate-stream-c20.csv",
+          "summary": {
+            "requests": 1432,
+            "requests_ok": 1432,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 1432,
+              "min": 411.52,
+              "p50": 413.483,
+              "p95": 415.33585,
+              "p99": 418.25279000000006,
+              "max": 444.917
+            },
+            "backend_ms": {
+              "n": 1432,
+              "min": 410.95,
+              "p50": 412.631,
+              "p95": 414.104,
+              "p99": 416.33896000000004,
+              "max": 436.473
+            },
+            "ttft_ms": {
+              "n": 1432,
+              "min": 101.416,
+              "p50": 103.3175,
+              "p95": 105.0419,
+              "p99": 106.94959000000001,
+              "max": 134.524
+            },
+            "overhead_ms": {
+              "n": 1432,
+              "min": 0.09100000000000819,
+              "p50": 0.8505000000000109,
+              "p95": 1.6624499999999927,
+              "p99": 2.540200000000007,
+              "max": 21.749000000000024
+            },
+            "tokens_per_sec_median": 103.1625,
+            "tokens_per_sec_mean": 103.15579608938565,
+            "e2e_p50_ms": 413.483,
+            "e2e_p95_ms": 415.33585,
+            "overhead_p95_ms": 1.6624499999999927
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 1432,
+        "requests_ok": 1432,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 1432,
+          "min": 411.52,
+          "p50": 413.483,
+          "p95": 415.33585,
+          "p99": 418.25279000000006,
+          "max": 444.917
+        },
+        "backend_ms": {
+          "n": 1432,
+          "min": 410.95,
+          "p50": 412.631,
+          "p95": 414.104,
+          "p99": 416.33896000000004,
+          "max": 436.473
+        },
+        "ttft_ms": {
+          "n": 1432,
+          "min": 101.416,
+          "p50": 103.3175,
+          "p95": 105.0419,
+          "p99": 106.94959000000001,
+          "max": 134.524
+        },
+        "overhead_ms": {
+          "n": 1432,
+          "min": 0.09100000000000819,
+          "p50": 0.8505000000000109,
+          "p95": 1.6624499999999927,
+          "p99": 2.540200000000007,
+          "max": 21.749000000000024
+        },
+        "tokens_per_sec_median": 103.1625,
+        "tokens_per_sec_mean": 103.15579608938565,
+        "e2e_p50_ms": 413.483,
+        "e2e_p95_ms": 415.33585,
+        "overhead_p95_ms": 1.6624499999999927
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    },
+    {
+      "config_id": "validate-stream-c50",
+      "series": "validate-stream",
+      "arm": "A",
+      "model": "mock-deterministic",
+      "runtime": "mock",
+      "workload": "synthetic",
+      "concurrency_target": 50,
+      "repeats": 1,
+      "runs": [
+        {
+          "run_id": "validate-stream-c50",
+          "source": "validate-stream-c50.csv",
+          "summary": {
+            "requests": 3641,
+            "requests_ok": 3641,
+            "error_rate": 0.0,
+            "error_types": {},
+            "e2e_ms": {
+              "n": 3641,
+              "min": 410.955,
+              "p50": 413.097,
+              "p95": 415.243,
+              "p99": 418.23979999999995,
+              "max": 447.848
+            },
+            "backend_ms": {
+              "n": 3641,
+              "min": 410.814,
+              "p50": 412.318,
+              "p95": 413.967,
+              "p99": 416.6476,
+              "max": 441.765
+            },
+            "ttft_ms": {
+              "n": 3641,
+              "min": 101.038,
+              "p50": 102.961,
+              "p95": 105.116,
+              "p99": 108.17219999999999,
+              "max": 137.342
+            },
+            "overhead_ms": {
+              "n": 3641,
+              "min": 0.060000000000002274,
+              "p50": 0.7409999999999854,
+              "p95": 1.627999999999986,
+              "p99": 2.3946000000000014,
+              "max": 27.15700000000004
+            },
+            "tokens_per_sec_median": 103.185,
+            "tokens_per_sec_mean": 103.18077808294417,
+            "e2e_p50_ms": 413.097,
+            "e2e_p95_ms": 415.243,
+            "overhead_p95_ms": 1.627999999999986
+          }
+        }
+      ],
+      "pooled": {
+        "requests": 3641,
+        "requests_ok": 3641,
+        "error_rate": 0.0,
+        "error_types": {},
+        "e2e_ms": {
+          "n": 3641,
+          "min": 410.955,
+          "p50": 413.097,
+          "p95": 415.243,
+          "p99": 418.23979999999995,
+          "max": 447.848
+        },
+        "backend_ms": {
+          "n": 3641,
+          "min": 410.814,
+          "p50": 412.318,
+          "p95": 413.967,
+          "p99": 416.6476,
+          "max": 441.765
+        },
+        "ttft_ms": {
+          "n": 3641,
+          "min": 101.038,
+          "p50": 102.961,
+          "p95": 105.116,
+          "p99": 108.17219999999999,
+          "max": 137.342
+        },
+        "overhead_ms": {
+          "n": 3641,
+          "min": 0.060000000000002274,
+          "p50": 0.7409999999999854,
+          "p95": 1.627999999999986,
+          "p99": 2.3946000000000014,
+          "max": 27.15700000000004
+        },
+        "tokens_per_sec_median": 103.185,
+        "tokens_per_sec_mean": 103.18077808294417,
+        "e2e_p50_ms": 413.097,
+        "e2e_p95_ms": 415.243,
+        "overhead_p95_ms": 1.627999999999986
+      },
+      "repeat_comparison": {},
+      "repeat_flags": []
+    }
+  ]
+}

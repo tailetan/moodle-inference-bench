@@ -7,7 +7,7 @@ PY := .venv/bin/python
 PORT ?= 8090
 DURATION ?= 30
 
-.PHONY: help venv smoke validate mock clean
+.PHONY: help venv smoke validate mock analyse test-analyse clean
 
 help:
 	@grep -E "^[a-zA-Z_-]+:.*?## .*$$" $(MAKEFILE_LIST) | \
@@ -27,3 +27,9 @@ validate: ## prove the harness against the mock at every concurrency level
 
 clean: ## remove generated smoke output and caches
 	rm -rf results/raw/smoke bench/__pycache__
+
+analyse: ## summarise raw CSVs and regenerate every chart
+	$(PY) bench/analyse.py results/raw/validation --out-dir results
+
+test-analyse: ## self-checks for the analysis code
+	$(PY) bench/test_analyse.py

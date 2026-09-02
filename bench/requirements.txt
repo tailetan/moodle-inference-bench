@@ -1,4 +1,10 @@
 # Pinned so a reader reproduces the same instrument, not a similar one.
-# Phase 1 (mock server + harness + validation) needs only aiohttp.
-# Analysis dependencies (phase 2) are added to this file when phase 2 lands.
+
+# Phase 1: mock server, harness, validation. The harness itself uses only the
+# standard library beyond this, so nothing numeric can drift under it.
 aiohttp==3.9.5
+
+# Phase 2: analysis and plotting. matplotlib pulls numpy; both are pinned
+# because charts are regenerated from raw data and must be reproducible.
+matplotlib==3.10.9
+numpy==2.2.6

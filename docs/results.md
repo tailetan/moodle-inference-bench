@@ -24,12 +24,35 @@ value, delta and tolerance.
 The validation summary table produced by that script is reproduced in the
 [README](../README.md).
 
+**The analysis pipeline.** `bench/analyse.py` reads those raw CSVs and produces
+[`../results/summary.csv`](../results/summary.csv),
+[`../results/summary.json`](../results/summary.json) and the charts in
+[`../results/charts/`](../results/charts/). Everything is regenerated from the
+raw rows on every run, never from the summary, so any chart can be recomputed
+from committed data.
+
+The numbers it currently reports are the instrument's, not the study's: every
+row came from the mock backend, so `t1 - t2` there is the harness's own
+scheduling delay rather than Moodle's overhead. `analyse.py` says so itself when
+every row has `runtime=mock`, rather than relying on the reader to notice.
+
+`bench/test_analyse.py` checks the analysis code against constructed inputs: 28
+checks covering percentiles, blank cells not being treated as zero, `t1 - t2`
+being computed per request rather than by subtracting two percentiles, errors
+being excluded from latency but counted in the error rate, the 10% repeat
+variance flag firing in both directions, and configurations that differ in more
+than concurrency not being drawn as one line.
+
 ## What has not been measured
 
-- **Q1, Moodle's AI subsystem overhead.** Needs the provider plugin (phase 3),
-  the Docker environment (phase 4) and the Arm A execution matrix (phase 6).
-  There is currently no Moodle in the measurement path at all, so no figure for
-  `T1 - T2` in the methodology's sense exists.
+- **Q1, Moodle's AI subsystem overhead.** The provider plugin and the benchmark
+  driver endpoint exist (phase 3), and Moodle has been driven end to end against
+  the mock by hand, so `T1` and `T2` are both recorded per request. What does not
+  exist is a measurement run: the environment wiring (phase 4), the prompt corpus
+  (phase 5) and the Arm A execution matrix (phase 6) are all still to come. **No
+  figure for `T1 - T2` in the methodology's sense exists**, because no run has
+  been made with repeats, a concurrency ladder or the section 6 machine controls
+  in force.
 - **Q2, CPU inference viability.** Arm B. Not started, and deliberately
   sequenced after Arm A.
 - **Q3, output quality against a cloud baseline.** Not started.
@@ -39,9 +62,13 @@ The validation summary table produced by that script is reproduced in the
 
 ## Notes for when results do arrive
 
-- Percentiles, never bare averages. p50, p95 and p99.
+- Percentiles, never bare averages. p50, p95 and p99. `analyse.py` reports the
+  mean only for sustained output rate, where the methodology asks for it, and
+  always alongside the median.
 - Three repeats per configuration, median reported, and any configuration whose
-  repeats vary by more than 10% flagged rather than averaged away.
+  repeats vary by more than 10% flagged rather than averaged away. Every
+  configuration recorded so far has a single repeat, so `analyse.py` says the
+  check could not be applied rather than reporting agreement it did not test.
 - Charts are derived artefacts. They are regenerated from the committed raw CSVs
   by a script in the repository, so a reader can rerun or dispute them.
 - The success criteria in methodology section 3 were fixed before any run and

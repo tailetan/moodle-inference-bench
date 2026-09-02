@@ -17,7 +17,7 @@ the specification. Code that would contradict it does not get written.
 
 ## Status
 
-**Phases 1 and 3 complete. Phases 2, 4, 5 and 6 not started.**
+**Phases 1, 2 and 3 complete. Phases 4, 5 and 6 not started.**
 
 No study result exists yet. Read that sentence literally -- there is no model
 anywhere, no prompt corpus, and no figure for Moodle's subsystem overhead. What
@@ -31,7 +31,7 @@ no repeats, no concurrency ladder, no machine controls, no percentiles.
 | Phase | | Status |
 |---|---|---|
 | 1 | Harness and instrument validation | Done |
-| 2 | Analysis and plotting | Not started |
+| 2 | Analysis and plotting | Done |
 | 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Done |
 | 4 | Environment wiring (native, no Docker) | Not started |
 | 5 | Prompt corpus | Not started |
@@ -270,6 +270,31 @@ so a refused connection to a configured endpoint escapes as an uncaught
 exception instead of becoming a handled AI error. That is the most likely
 failure mode when pointing Moodle at a local runtime that is not running. This
 plugin catches `GuzzleException` instead.
+
+## Phase 2: analysis and plotting
+
+`bench/analyse.py` reads raw CSVs and writes `results/summary.csv`,
+`results/summary.json` and the charts in `results/charts/`. Charts are
+regenerated from the raw rows on every run, never from the summary, so a reader
+who disputes one can recompute it from committed data. Each chart carries a
+footer naming the data it came from.
+
+Three details that decide whether the output is trustworthy:
+
+- **`t1 - t2` is computed per request, then summarised.** The p95 of a
+  difference is not the difference of two p95s, and taking the second would
+  quietly misreport the study's headline number.
+- **A blank cell is not zero.** An empty `ttft_ms` means the value was not
+  observable on that request, so it is excluded rather than averaged in as zero.
+- **Repeats are compared, not merged.** A configuration whose repeats disagree
+  by more than 10% is flagged with the actual spread. A configuration with one
+  repeat is reported as unchecked rather than as consistent.
+
+`bench/test_analyse.py` exercises all of that against constructed inputs, 28
+checks in total, including the repeat-variance alarm in both directions -- it
+has never fired on real data, and an alarm nobody has tested is not an alarm.
+
+Run it with `make analyse` and `make test-analyse`.
 
 ## Standards this repo holds itself to
 
