@@ -109,14 +109,21 @@ no HTTP status onto 500.
 PHPUnit tests covering request construction, response parsing, error mapping,
 transport failures and timeout handling are in `tests/`.
 
-**They have not been executed.** The Moodle checkout they were written against
-has no PHPUnit environment: no `vendor/` directory and no `phpunit_prefix` in
-`config.php`. Setting that up changes the host's Moodle configuration and
-downloads dependencies, so it has not been done unasked. Until it is, treat
-these tests as unverified.
+**26 tests, 77 assertions, all passing** against Moodle 5.2.2+ on PHP 8.3.30 and
+PostgreSQL 16.13:
 
-What *has* been verified end to end against a running Moodle, with the
-deterministic mock as the backend:
+```
+vendor/bin/phpunit --testsuite aiprovider_edgellm_testsuite
+```
+
+The run reports three PHPUnit deprecations, all of the form "Metadata found in
+doc-comment ... use attributes instead". They come from the `@covers`
+annotations. Core's own `aiprovider_ollama` tests emit the same warning, so this
+matches current Moodle convention and is left alone rather than diverging from
+the surrounding codebase.
+
+Also verified end to end against a running Moodle, with the deterministic mock
+as the backend:
 
 - the plugin installs through `admin/cli/upgrade.php`
 - every file passes `php -l`

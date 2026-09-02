@@ -261,25 +261,25 @@ final class abstract_processor_test extends \advanced_testcase {
      * misses it entirely.
      */
     public function test_transport_error_without_a_status_maps_to_500(): void {
-         = new \GuzzleHttp\Exception\ConnectException(
+        $exception = new \GuzzleHttp\Exception\ConnectException(
             'Connection refused',
             new \GuzzleHttp\Psr7\Request('POST', ''),
         );
-         = ->invoke('handle_transport_error', []);
+        $result = $this->invoke('handle_transport_error', [$exception]);
 
-        ->assertFalse(['success']);
-        ->assertEquals(500, ['errorcode']);
+        $this->assertFalse($result['success']);
+        $this->assertEquals(500, $result['errorcode']);
     }
 
     /**
      * A transport exception that does carry a usable HTTP status keeps it.
      */
     public function test_transport_error_keeps_a_valid_status(): void {
-         = new \GuzzleHttp\Exception\TransferException('Gone', 410);
-         = ->invoke('handle_transport_error', []);
+        $exception = new \GuzzleHttp\Exception\TransferException('Gone', 410);
+        $result = $this->invoke('handle_transport_error', [$exception]);
 
-        ->assertFalse(['success']);
-        ->assertEquals(410, ['errorcode']);
+        $this->assertFalse($result['success']);
+        $this->assertEquals(410, $result['errorcode']);
     }
 
     /**

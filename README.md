@@ -17,8 +17,7 @@ the specification. Code that would contradict it does not get written.
 
 ## Status
 
-**Phase 1 complete and validated. Phase 3 built, with its unit tests not yet
-executed.**
+**Phases 1 and 3 complete. Phases 2, 4, 5 and 6 not started.**
 
 No study result exists yet. Read that sentence literally -- there is no model
 anywhere, no prompt corpus, and no figure for Moodle's subsystem overhead. What
@@ -33,7 +32,7 @@ no repeats, no concurrency ladder, no machine controls, no percentiles.
 |---|---|---|
 | 1 | Harness and instrument validation | Done |
 | 2 | Analysis and plotting | Not started |
-| 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Built, tests unrun |
+| 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Done |
 | 4 | Environment wiring (native, no Docker) | Not started |
 | 5 | Prompt corpus | Not started |
 | 6 | Arm A execution | Not started |
@@ -259,9 +258,9 @@ afterwards.
 Verified by hand against a running Moodle 5.2 with the mock as the backend: the
 plugin installs, all three security gates on the benchmark endpoint hold, both
 `summarise_text` and `generate_text` return `t1_total_ms` and `t2_model_ms`, and
-a refused connection returns JSON with both timings still recorded. **The PHPUnit
-tests in `plugin/edgellm/tests/` have not been executed** -- the host's Moodle has
-no PHPUnit environment. Until they run, treat them as unverified.
+a refused connection returns JSON with both timings still recorded. The PHPUnit
+suite in `plugin/edgellm/tests/` runs **26 tests and 77 assertions, all
+passing**, on Moodle 5.2.2+ with PHP 8.3.30 and PostgreSQL 16.13.
 
 ### A bug found in core along the way
 

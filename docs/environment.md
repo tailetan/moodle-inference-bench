@@ -156,3 +156,39 @@ only because it shows the study is unlikely to produce a trivial null result:
 the gap is the same order of magnitude as the 100 ms budget in section 3, so
 there is something there worth measuring properly. The real figure comes from
 Arm A in phase 6.
+
+## PHPUnit
+
+Set up on 2 September 2026 so the provider plugin's tests could run. The Moodle
+checkout had no PHPUnit environment before this: no `vendor/` directory and no
+`phpunit_prefix`.
+
+What was done, in the Moodle root:
+
+```bash
+cp config.php config.php.bak-prephpunit
+composer install
+# two lines added to config.php, before require_once(lib/setup.php)
+php public/admin/tool/phpunit/cli/init.php
+```
+
+The two lines:
+
+```php
+$CFG->phpunit_prefix = 'phpu_';
+$CFG->phpunit_dataroot = '/home/tailetan/workspace/phpunitdata';
+```
+
+The test environment uses a separate table prefix and a separate dataroot, so
+the development site's own data and database tables are untouched. The original
+`config.php` is kept at `config.php.bak-prephpunit`.
+
+Running the plugin's suite:
+
+```bash
+cd ~/workspace/moodle
+vendor/bin/phpunit --testsuite aiprovider_edgellm_testsuite
+```
+
+26 tests, 77 assertions, all passing on Moodle 5.2.2+, PHP 8.3.30 and PostgreSQL
+16.13.
