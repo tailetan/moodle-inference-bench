@@ -17,18 +17,23 @@ the specification. Code that would contradict it does not get written.
 
 ## Status
 
-**Phase 1 of 6 complete: the measuring instrument is built and validated.**
+**Phase 1 complete and validated. Phase 3 built, with its unit tests not yet
+executed.**
 
-No study result exists yet. Read that sentence literally -- there is currently no
-Moodle in the measurement path, no model, and no figure for Moodle's subsystem
-overhead. What exists is a load harness and a mock backend, and evidence that the
-harness measures accurately.
+No study result exists yet. Read that sentence literally -- there is no model
+anywhere, no prompt corpus, and no figure for Moodle's subsystem overhead. What
+exists is a validated load harness, a deterministic mock backend, and a provider
+plugin that has been driven end to end against that mock by hand.
+
+Moodle is now in the measurement path, and both `T1` and `T2` are recorded
+independently on every request. What has not happened is a measurement run:
+no repeats, no concurrency ladder, no machine controls, no percentiles.
 
 | Phase | | Status |
 |---|---|---|
 | 1 | Harness and instrument validation | Done |
 | 2 | Analysis and plotting | Not started |
-| 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Not started |
+| 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Built, tests unrun |
 | 4 | Environment wiring (native, no Docker) | Not started |
 | 5 | Prompt corpus | Not started |
 | 6 | Arm A execution | Not started |
@@ -230,6 +235,42 @@ named the cause rather than quietly returning plausible-looking numbers. And
 methodology section 6's laptop controls -- no browser, no IDE, nothing else
 running -- are not boilerplate on this machine. Arm A execution in phase 6 has
 to honour them or the run is wasted.
+
+## Phase 3: the provider plugin
+
+[`plugin/edgellm/`](plugin/edgellm/) holds `aiprovider_edgellm`, which mounts to
+`<moodle>/ai/provider/edgellm` via
+[`scripts/sync-plugin.sh`](scripts/sync-plugin.sh). Its own
+[README](plugin/edgellm/README.md) covers the design.
+
+Two things are worth pulling out here.
+
+**`T1` and `T2` come from different places, by necessity.** `T2` is the HTTP
+boundary, visible only to code inside a provider. `T1` is the whole core path,
+and a provider sits below the manager so it cannot see it. So `bench.php` times
+`\core_ai\manager::process_action()` from outside, and the provider records `T2`
+from inside. Neither is derived from the other.
+
+**Instrumentation writes nothing.** No database, no log, no file. A write inside
+the request would land inside `T1` and inflate the number the study exists to
+measure. The value is held in memory for the life of the request and read
+afterwards.
+
+Verified by hand against a running Moodle 5.2 with the mock as the backend: the
+plugin installs, all three security gates on the benchmark endpoint hold, both
+`summarise_text` and `generate_text` return `t1_total_ms` and `t2_model_ms`, and
+a refused connection returns JSON with both timings still recorded. **The PHPUnit
+tests in `plugin/edgellm/tests/` have not been executed** -- the host's Moodle has
+no PHPUnit environment. Until they run, treat them as unverified.
+
+### A bug found in core along the way
+
+Guzzle's `ConnectException` extends `TransferException` and is **not** a
+`RequestException`. Core's `aiprovider_openai` catches only `RequestException`,
+so a refused connection to a configured endpoint escapes as an uncaught
+exception instead of becoming a handled AI error. That is the most likely
+failure mode when pointing Moodle at a local runtime that is not running. This
+plugin catches `GuzzleException` instead.
 
 ## Standards this repo holds itself to
 
