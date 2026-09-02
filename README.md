@@ -28,7 +28,7 @@ harness measures accurately.
 |---|---|---|
 | 1 | Harness and instrument validation | Done |
 | 2 | Analysis and plotting | Not started |
-| 3 | Moodle provider plugin (`aiprovider_edgellm`) | Not started |
+| 3 | Provider paths: core `aiprovider_openai` plus `aiprovider_edgellm` | Not started |
 | 4 | Environment wiring (native, no Docker) | Not started |
 | 5 | Prompt corpus | Not started |
 | 6 | Arm A execution | Not started |

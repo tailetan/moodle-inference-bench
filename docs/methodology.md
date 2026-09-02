@@ -143,6 +143,12 @@ Two boundaries, logged independently on every request:
 
 Never infer one from the other. Never estimate either. Both are recorded per request or the arm is invalid.
 
+> **Amended 2 September 2026.** This section originally assumed a single
+> measurement path through a purpose-built provider plugin. It now uses three
+> paths, one of which contains no code of ours at all. See revision R1.
+
+
+
 In Arm A, because T2 is known exactly rather than measured noisily, the subtraction is clean. This is the one respect in which having no GPU produces a *better* experiment than having one: there is no thermal drift, no scheduler variance and no batching behaviour to confound the result.
 
 ## 8. Load generation
@@ -235,7 +241,7 @@ State these in the write-up rather than waiting for a reviewer.
 1. Agree this document.
 2. Build the mock server and load harness. Validate the harness against the mock at every concurrency level in section 2. **No model involved, no hardware needed.**
 3. Build the prompt corpus and freeze it.
-4. Write `aiprovider_edgellm` with T1/T2 instrumentation.
+4. Write `aiprovider_edgellm` with T1/T2 instrumentation, and configure core's own `aiprovider_openai` against the mock as the primary measurement path. See revision R1.
 5. **Run Arm A in full.** It is fast, it needs no model, and it answers the novel question. If everything else stalls, this alone is a publishable result.
 6. Pilot Arm B at concurrency 1 with the 3B model only. Revise this document based on what it shows.
 7. Run Arm B in full.
@@ -304,3 +310,71 @@ Three named profiles are defined in `bench/mock_server.py`. `fast` and `slow` ar
 | `slow` | 800 ms | 25 ms | 200 | 5,775 ms |
 
 These are configuration points chosen to separate a fixed per-request overhead in Moodle from one that scales with backend latency. They are not measurements of any model and must not be presented as such.
+
+
+---
+
+## Revisions
+
+Changes to the design after version 2 was agreed. Section 15 requires these to be
+made openly rather than quietly, so each one states what changed, what prompted
+it, and what it costs.
+
+### R1. Measure through core's own provider, not only through ours
+
+*2 September 2026. Amends sections 7 and 15 step 4. Prompted by an inspection of
+the Moodle 5.2 checkout on the test host.*
+
+**What prompted it.** Moodle 5.2 ships six AI providers in `public/ai/provider/`:
+`awsbedrock`, `azureai`, `deepseek`, `gemini`, `ollama` and `openai`. Two of them
+take an arbitrary endpoint URL from configuration, with no core modification
+required:
+
+| Provider | How the endpoint is set |
+|---|---|
+| `aiprovider_ollama` | `config['endpoint']`, an admin form field of type `PARAM_URL`, default `http://localhost:11434` |
+| `aiprovider_openai` | `actionconfig[<action>]['settings']['endpoint']`, configurable per action |
+
+**The problem this exposes.** The original plan measured `T1` only through
+`aiprovider_edgellm`, a plugin written for this study. Any figure produced that
+way is open to an obvious objection: that the overhead measured is the study
+plugin's, not Moodle's. The study's headline claim would rest on code nobody else
+runs.
+
+**The change.** Arm A is measured over three paths rather than one.
+
+| Path | Provider | Backend | Supplies |
+|---|---|---|---|
+| A1 | Core `aiprovider_openai`, unmodified | Mock | `T1`. No code of ours in the path, so the overhead is attributable to core. |
+| A2 | `aiprovider_edgellm` | Mock | `T2` at the plugin's HTTP boundary, and a second `T1` for comparison. |
+| B1 | Core `aiprovider_ollama`, unmodified | Real runtime | Arm B, with no custom plugin at all. |
+
+A1 is the primary result. A2 exists because `T2` at the provider's HTTP boundary
+cannot be recorded without code inside a provider, and because comparing its `T1`
+against A1's tests whether our plugin distorts the measurement. **If A1 and A2
+disagree, that disagreement is a reported finding, not a nuisance to be averaged
+away.**
+
+**What this costs.** `aiprovider_edgellm` stays, but shrinks: it exists for
+instrumentation and for pointing at an arbitrary OpenAI-compatible endpoint, not
+as a general-purpose provider. Less code than the original plan, not more.
+
+**What is not yet verified.** Two assumptions behind this revision are read off
+the source and have not been executed:
+
+1. That `aiprovider_openai` functions against a non-OpenAI endpoint. It may send
+   authentication headers, or validate response fields the mock does not yet
+   return.
+2. That the mock can stand in for `aiprovider_ollama`. That provider speaks the
+   Ollama API shape rather than `/v1/chat/completions`, so the mock needs an
+   Ollama-shaped route added before path B1 can be exercised against it.
+
+Both are phase 3 checks. If either fails, this revision is amended again rather
+than quietly worked around.
+
+**What did not change.** The reasoning for keeping Moodle in the measurement path
+at all, which core's built-in AI support strengthens rather than weakens: Q1 is
+definitionally a question about Moodle, and core shipping a configurable Ollama
+provider means "Moodle against a local CPU model" is now a supported
+configuration a site administrator can enable today. Whether it is usable without
+a GPU is exactly Q2, and it remains unpublished.
