@@ -49,7 +49,7 @@ an open-loop design and is why the column is named ``concurrency_target``.
 
 Usage::
 
-    .venv/bin/python bench/harness.py --url http://127.0.0.1:8080 \\
+    .venv/bin/python bench/harness.py --url http://127.0.0.1:8090 \\
         --concurrency 10 --expected-latency-ms 410 --duration 60 \\
         --out results/raw/example.csv
 """
@@ -690,7 +690,7 @@ def print_summary(result):
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description="Open-loop Poisson load generator with dual t1/t2 timing.")
-    parser.add_argument("--url", default="http://127.0.0.1:8080",
+    parser.add_argument("--url", default="http://127.0.0.1:8090",
                         help="base URL of the OpenAI-compatible endpoint")
     parser.add_argument("--arm", default="A")
     parser.add_argument("--config-id", default="adhoc")

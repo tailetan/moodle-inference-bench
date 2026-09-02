@@ -29,13 +29,21 @@ harness measures accurately.
 | 1 | Harness and instrument validation | Done |
 | 2 | Analysis and plotting | Not started |
 | 3 | Moodle provider plugin (`aiprovider_edgellm`) | Not started |
-| 4 | Docker environment | Not started |
+| 4 | Environment wiring (native, no Docker) | Not started |
 | 5 | Prompt corpus | Not started |
 | 6 | Arm A execution | Not started |
 | -- | Arm B (CPU inference viability) | Deliberately last |
 
 [`docs/results.md`](docs/results.md) states what has and has not been measured in
 more detail.
+
+There is no Docker in this study. Moodle 5.2, PHP 8.3 and PostgreSQL run
+natively on the host, which removes a container layer from between the harness
+and the thing being measured. [`docs/environment.md`](docs/environment.md)
+records that setup, and the one open problem it creates: the Moodle dev server
+currently caps concurrency at 8, well below the top of the Arm A ladder, and
+that has to be resolved before Arm A executes or the cap would be misreported as
+Moodle's own overhead.
 
 ## The two arms
 
@@ -90,6 +98,9 @@ git clone <this repo> && cd moodle-inference-bench
 The last command is the phase 1 deliverable: it starts the mock, drives the
 harness at every concurrency level in both streaming and non-streaming mode, and
 reports pass or fail per level.
+
+The mock server defaults to port 8090, not 8080: WSL2 runs every distribution in
+one network namespace, and a Moodle dev server commonly holds 8080.
 
 Requirements: Python 3.10+ and `curl`. `make` is optional -- the `Makefile`
 wraps the same scripts, but every phase 1 workflow has a `scripts/` entry point
@@ -232,7 +243,8 @@ to honour them or the run is wasted.
 ## Repository layout
 
 ```
-docs/           methodology (the specification), machine profile, results
+docs/           methodology (the specification), machine profile,
+                environment, results
 plugin/edgellm/ the Moodle AI provider plugin (phase 3); mounts to
                 <moodle>/ai/provider/edgellm
 bench/          mock server, harness, validation, analysis, run configs

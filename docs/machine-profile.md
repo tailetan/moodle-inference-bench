@@ -92,9 +92,7 @@ Deliberately empty rather than guessed at:
 
 - CPU package temperature and clock under load. The telemetry sampler that
   section 12 requires is a phase 6 deliverable and does not exist yet.
-- Docker Desktop version. Docker is not installed on this host, which phase 4
-  will need to resolve.
-- Moodle version, image tags, model files and checksums. Phases 3 to 5.
+- Model files and checksums. Phase 5 onwards.
 
 ## Sensitivity to background activity, observed
 

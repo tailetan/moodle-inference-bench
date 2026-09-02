@@ -4,7 +4,7 @@
 # Run these inside WSL2 (or any Linux shell). See docs/machine-profile.md.
 
 PY := .venv/bin/python
-PORT ?= 8080
+PORT ?= 8090
 DURATION ?= 30
 
 .PHONY: help venv smoke validate mock clean

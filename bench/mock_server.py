@@ -35,7 +35,7 @@ paths must be equally deterministic.
 
 Run::
 
-    .venv/bin/python bench/mock_server.py --profile mid --port 8080
+    .venv/bin/python bench/mock_server.py --profile mid --port 8090
 """
 
 from __future__ import annotations
@@ -320,7 +320,10 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(
         description="Deterministic OpenAI-compatible mock endpoint for Arm A.")
     parser.add_argument("--host", default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=8080)
+    parser.add_argument("--port", type=int, default=8090,
+                        help="8090 rather than 8080: a Moodle dev server "
+                             "commonly occupies 8080, and WSL2 distributions "
+                             "share one network namespace")
     parser.add_argument("--profile", choices=sorted(PROFILES), default="mid",
                         help="named latency profile used as the server default")
     parser.add_argument("--ttft-ms", type=float, default=None,

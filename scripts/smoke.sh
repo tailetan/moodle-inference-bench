@@ -4,7 +4,7 @@
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 PY=.venv/bin/python
-PORT=${PORT:-8099}
+PORT=${PORT:-8090}
 
 $PY -c "import ast
 for f in ['bench/mock_server.py','bench/harness.py','bench/validate_harness.py']:
