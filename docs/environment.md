@@ -73,3 +73,47 @@ OpenAI-compatible endpoint, which is what Arm A needs and what a shipping
 provider deliberately does not do. Worth deciding, before phase 3 starts,
 whether to also spot-check against core's own provider so the overhead figure is
 not specific to our plugin.
+
+## Verified: core's own provider can drive the mock
+
+Run on 2 September 2026 by `scripts/spike_core_provider.php`, which creates an
+unmodified `aiprovider_openai` instance pointed at the mock, runs one real
+`summarise_text` through `\core_ai\manager::process_action()`, and removes
+everything afterwards. It passed: core reached the mock and parsed the response.
+
+This is what makes path A1 in methodology revision R1 real rather than proposed.
+
+Three practical points came out of it.
+
+**cURL security blocks the request by default.** `core\http_client` enforces
+`curlsecurityblockedhosts` (which lists `127.0.0.0/8` and `localhost`) and
+`curlsecurityallowedport` (which permits only 80 and 443). Both must be widened
+before any local endpoint is reachable, and both are now recorded as controlled
+variables in the methodology. The spike widens them at the start and restores
+them at the end, so it leaves no lasting change.
+
+**The mock had to return `system_fingerprint`.** Core reads that field
+unconditionally. It now returns a fixed value.
+
+**The two WSL2 distributions share a loopback interface.** A mock bound to
+`127.0.0.1` in the bench distribution is reachable at `http://localhost:<port>`
+from the Moodle distribution. Binding to `0.0.0.0` is not required. This was
+tested directly rather than inferred, because an earlier failure that looked
+like a binding problem turned out to be a mock process that had exited with the
+shell that launched it.
+
+That last point is worth remembering when running anything long: a process
+started inside a one-shot `wsl.exe` invocation dies when that invocation ends.
+
+### An indicative number, which is not a result
+
+The single spike request completed in about 473 ms against a mock configured for
+410 ms.
+
+**Do not quote this.** It is one request, not three repeats of a five-minute
+run. It went through PHP CLI rather than the web server, with a cold opcache, no
+warmup, and none of the section 6 laptop controls in force. It is recorded here
+only because it shows the study is unlikely to produce a trivial null result:
+the gap is the same order of magnitude as the 100 ms budget in section 3, so
+there is something there worth measuring properly. The real figure comes from
+Arm A in phase 6.

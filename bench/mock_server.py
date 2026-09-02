@@ -67,6 +67,11 @@ PROFILES = {
 
 MODEL_NAME = "mock-deterministic"
 
+# Moodle's aiprovider_openai reads $bodyobj->system_fingerprint unconditionally
+# in handle_api_success(), so the field has to be present or PHP warns on every
+# request. Fixed rather than random: the mock is deterministic.
+SYSTEM_FINGERPRINT = "fp_mock_deterministic"
+
 # One "token" of output text. Deliberately boring: the mock says nothing about
 # quality, only about time.
 TOKEN_TEXT = "lorem "
@@ -148,6 +153,7 @@ def _chunk(request_id, created, delta, finish, extra=None):
         "object": "chat.completion.chunk",
         "created": created,
         "model": MODEL_NAME,
+        "system_fingerprint": SYSTEM_FINGERPRINT,
         "choices": [{"index": 0, "delta": delta, "finish_reason": finish}],
     }
     if extra:
@@ -218,6 +224,7 @@ async def handle_chat_completions(request):
                 "object": "chat.completion",
                 "created": created,
                 "model": MODEL_NAME,
+                "system_fingerprint": SYSTEM_FINGERPRINT,
                 "choices": [{
                     "index": 0,
                     "message": {"role": "assistant",

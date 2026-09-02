@@ -359,18 +359,52 @@ away.**
 instrumentation and for pointing at an arbitrary OpenAI-compatible endpoint, not
 as a general-purpose provider. Less code than the original plan, not more.
 
-**What is not yet verified.** Two assumptions behind this revision are read off
-the source and have not been executed:
+**Verification status.** Two assumptions sat behind this revision. The first has
+since been executed, the second has not.
 
-1. That `aiprovider_openai` functions against a non-OpenAI endpoint. It may send
-   authentication headers, or validate response fields the mock does not yet
-   return.
-2. That the mock can stand in for `aiprovider_ollama`. That provider speaks the
-   Ollama API shape rather than `/v1/chat/completions`, so the mock needs an
-   Ollama-shaped route added before path B1 can be exercised against it.
+*Assumption 1, that `aiprovider_openai` functions against a non-OpenAI endpoint:*
+**verified on 2 September 2026.** `scripts/spike_core_provider.php` creates an
+unmodified `aiprovider_openai` instance pointed at the mock, runs one real
+`summarise_text` through `\core_ai\manager::process_action()`, and tears
+everything down again. It succeeded: core reached the mock, and parsed the
+response into `generatedcontent`, `finishreason`, `prompttokens`,
+`completiontokens`, `model` and `fingerprint`. Path A1 is therefore real.
 
-Both are phase 3 checks. If either fails, this revision is amended again rather
-than quietly worked around.
+Three things had to be true, and only one of them was true to begin with:
+
+- Authentication is a bearer header built from the `apikey` config, and
+  `is_provider_configured()` requires only that the key is non-empty. Any
+  placeholder works against a mock that ignores the header. No obstacle.
+- The mock had to return `system_fingerprint`. Core reads
+  `$bodyobj->system_fingerprint` unconditionally, so its absence produced a PHP
+  warning on every request. The mock now returns a fixed value.
+- **Core's cURL security settings block the request outright.** See below.
+
+*Assumption 2, that the mock can stand in for `aiprovider_ollama`:* still
+unverified. That provider speaks the Ollama API shape rather than
+`/v1/chat/completions`, so the mock needs an Ollama-shaped route added before
+path B1 can be exercised against it. If it fails, this revision is amended again
+rather than quietly worked around.
+
+**New controlled variable: cURL security.** Moodle's `core\http_client` enforces
+two admin settings, and their shipped defaults on this host block any request to
+a local mock:
+
+| Setting | Default on the test host | Effect |
+|---|---|---|
+| `curlsecurityblockedhosts` | `127.0.0.0/8`, `192.168.0.0/16`, `10.0.0.0/8`, `172.16.0.0/12`, `0.0.0.0`, `localhost`, `169.254.169.254`, `0000::1` | The mock's host is blocked |
+| `curlsecurityallowedport` | `443`, `80` | The mock's port is blocked |
+
+Both must be widened for Arm A to run at all. That is a change to Moodle's
+security posture, so it belongs in section 6 as a **controlled variable to be
+recorded with the results**, not as incidental setup. The exact values in force
+during a run must be captured alongside the Moodle version.
+
+This also qualifies the "vanilla Moodle core" claim in the scope statement: core
+is unmodified, but it is not running at its default security configuration, and
+the write-up has to say so. It is worth noting that the same constraint applies
+to any real site running a model on its own hardware, so this is a deployment
+finding rather than only a benchmarking inconvenience.
 
 **What did not change.** The reasoning for keeping Moodle in the measurement path
 at all, which core's built-in AI support strengthens rather than weakens: Q1 is
