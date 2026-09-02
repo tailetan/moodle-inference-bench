@@ -40,10 +40,12 @@ more detail.
 There is no Docker in this study. Moodle 5.2, PHP 8.3 and PostgreSQL run
 natively on the host, which removes a container layer from between the harness
 and the thing being measured. [`docs/environment.md`](docs/environment.md)
-records that setup, and the one open problem it creates: the Moodle dev server
-currently caps concurrency at 8, well below the top of the Arm A ladder, and
-that has to be resolved before Arm A executes or the cap would be misreported as
-Moodle's own overhead.
+records that setup, along with two checks run against it before any phase work
+started: core's own `aiprovider_openai` does drive our mock endpoint, and the
+Moodle dev server's concurrency ceiling has been measured rather than guessed at.
+The ceiling is real, it sits at the configured worker count, and raising that
+count clears it for a trivial endpoint. Both results, and what remains unverified
+about them, are in [`docs/environment.md`](docs/environment.md).
 
 ## The two arms
 

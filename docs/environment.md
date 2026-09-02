@@ -34,34 +34,73 @@ That is what makes phase 6 possible without Docker. It also has a consequence
 worth remembering: **ports collide across distributions.** Moodle holds 8080, so
 the mock server defaults to 8090.
 
-## Open problem: the dev server caps concurrency at 8
+## Measured: the dev server ceiling is real, and raising it works
 
 `moodle-serve.sh` starts PHP's built-in server with `PHP_CLI_SERVER_WORKERS=8`.
-That is eight concurrent PHP requests, and the Arm A concurrency ladder goes to
-fifty.
+The Arm A concurrency ladder goes to 50. That was a suspicion read off a
+configuration value, so it was measured rather than assumed.
 
-This is not a performance inconvenience, it is a correctness threat to the
-study's headline finding. Beyond eight concurrent requests, arrivals queue in
-the web server *before* Moodle's AI subsystem sees them. That queueing lands
-inside `t1` and not inside `t2`, so it would be reported as Moodle subsystem
-overhead when it is really dev-server saturation. The result would look like
-prediction 2 in methodology section 4 coming true, and it would be an artefact.
+`scripts/spike_dev_server.py` serves a PHP script that does nothing but sleep for
+410 ms, and drives it with the same open-loop harness the benchmark uses. Because
+the sleep is the only work, every millisecond above 410 is queueing. Raw output:
+[`../results/raw/spike_dev_server.json`](../results/raw/spike_dev_server.json).
 
-It has to be resolved before Arm A executes. Options, not yet chosen:
+Latency above the 410 ms sleep, in milliseconds:
 
-1. **Raise the worker count** well above the top of the ladder. Cheapest, but
-   PHP's built-in server is explicitly not built for concurrency and may not
-   scale cleanly even so.
-2. **Run php-fpm behind nginx or Apache** in the Moodle distribution. Closest to
-   how a real site runs, which also makes the result more transferable. Needs
-   root in that distribution.
-3. **Cap the Arm A ladder** at what the server genuinely sustains and revise the
-   methodology openly to say why.
+| Concurrency | Target rate | 8 workers, p50 excess | 8 workers, p95 excess | 64 workers, p50 excess | 64 workers, p95 excess |
+|---|---|---|---|---|---|
+| 1 | 2.44/s | 110 | 568 | 22 | 162 |
+| 2 | 4.88/s | 201 | 997 | 26 | 40 |
+| 5 | 12.20/s | 99 | 672 | 30 | 42 |
+| 10 | 24.39/s | 1,361 | 2,568 | 23 | 39 |
+| 20 | 48.78/s | 8,228 | 15,770 | 18 | 37 |
+| 50 | 121.95/s | 15,398 | 28,723 | 13 | 427 |
 
-Whichever is chosen, the fix must be verified rather than assumed: drive the
-chosen stack with the harness against a trivial endpoint and confirm that
-latency does not inflect at the worker count. The harness already reports the
-saturation signals needed to see it.
+At 8 workers, concurrency 50 also lost **39.4% of requests to timeouts**. At 64
+workers nothing timed out at any level.
+
+**The ceiling sits exactly where the worker count puts it.** Each worker blocks
+for the whole sleep, so sustainable concurrency is the worker count. The
+inflection falls between 5 and 10, and by concurrency 20 the queueing delay is
+twenty times the backend latency it is supposed to be measuring.
+
+**It is the server, not the instrument.** The harness's own dispatch lag stayed
+between 4 and 43 ms throughout, while response latency reached 29 seconds. In an
+open-loop design dispatch does not wait for responses, so that gap is what
+distinguishes a saturated server from a saturated harness. The harness flagged
+itself as saturated only at the two worst levels, where the backlog was large
+enough to disturb it too.
+
+### Decision
+
+Raise the worker count. It is demonstrably sufficient for a trivial endpoint:
+at 64 workers the excess is 13 to 30 ms at the median across the whole ladder,
+against a 100 ms budget for Moodle's own overhead.
+
+Two conditions on that decision, neither yet satisfied:
+
+1. **Re-measure against real Moodle before Arm A runs.** This spike served a
+   sleep. Real Moodle does session handling, database queries and policy checks
+   per request, so its ceiling will be lower, and possibly much lower. The
+   number that matters is Moodle's, not PHP's.
+2. **Decide whether php-fpm behind nginx is needed for the published run.** PHP's
+   built-in server is explicitly not built for concurrency, and no real site uses
+   it. Results gathered on it are open to the objection that they describe a dev
+   server rather than a deployment. That objection is fair, and the answer
+   depends on whether the residual overhead at 64 workers stays small once real
+   Moodle is in the path.
+
+### A measurement-attribution point this exposes
+
+Even at 64 workers with a trivial script, the web server adds 13 to 30 ms at the
+median. That is the same order as the overhead Arm A is trying to detect.
+
+So `T1` must be instrumented **inside PHP**, around the `core_ai` manager call,
+exactly as section 7 of the methodology specifies. It must not be taken from the
+harness's wall clock, because that number includes web-server queueing and
+would inflate Moodle's apparent overhead by an amount that grows with load. The
+harness's end-to-end figure is still worth recording, but as a separate quantity
+answering a different question.
 
 ## Core already ships AI providers
 

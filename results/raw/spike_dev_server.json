@@ -1,0 +1,267 @@
+{
+  "sleep_ms": 410.0,
+  "runs": [
+    {
+      "workers": 8,
+      "levels": [
+        {
+          "concurrency": 1,
+          "target_rate": 2.4390243902439024,
+          "requests": 28,
+          "ok": 28,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 28,
+            "min": 430.056,
+            "p50": 520.012,
+            "p95": 978.258,
+            "p99": 1178.7575100000001,
+            "max": 1252.599,
+            "mean": 609.9893928571428
+          },
+          "excess_p50": 110.01199999999994,
+          "excess_p95": 568.258,
+          "dispatch_lag_p99": 4.325859984965064,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 2,
+          "target_rate": 4.878048780487805,
+          "requests": 52,
+          "ok": 52,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 52,
+            "min": 476.133,
+            "p50": 610.4929999999999,
+            "p95": 1407.2187999999994,
+            "p99": 1579.46966,
+            "max": 1580.711,
+            "mean": 724.5280769230774
+          },
+          "excess_p50": 200.49299999999994,
+          "excess_p95": 997.2187999999994,
+          "dispatch_lag_p99": 16.609598449431363,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 5,
+          "target_rate": 12.195121951219512,
+          "requests": 126,
+          "ok": 126,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 126,
+            "min": 433.184,
+            "p50": 508.741,
+            "p95": 1081.9134999999999,
+            "p99": 1253.98775,
+            "max": 1445.329,
+            "mean": 605.9575634920635
+          },
+          "excess_p50": 98.74099999999999,
+          "excess_p95": 671.9134999999999,
+          "dispatch_lag_p99": 14.390546755748801,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 10,
+          "target_rate": 24.390243902439025,
+          "requests": 250,
+          "ok": 250,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 250,
+            "min": 427.156,
+            "p50": 1770.892,
+            "p95": 2977.6589999999997,
+            "p99": 3087.6919699999994,
+            "max": 3130.98,
+            "mean": 1920.4541840000004
+          },
+          "excess_p50": 1360.892,
+          "excess_p95": 2567.6589999999997,
+          "dispatch_lag_p99": 7.371409509214563,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 20,
+          "target_rate": 48.78048780487805,
+          "requests": 491,
+          "ok": 491,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 491,
+            "min": 429.596,
+            "p50": 8637.78,
+            "p95": 16179.499,
+            "p99": 16704.519,
+            "max": 18612.221,
+            "mean": 8677.37083910387
+          },
+          "excess_p50": 8227.78,
+          "excess_p95": 15769.499,
+          "dispatch_lag_p99": 43.09724622871732,
+          "harness_saturated": true
+        },
+        {
+          "concurrency": 50,
+          "target_rate": 121.95121951219512,
+          "requests": 1199,
+          "ok": 726,
+          "error_rate": 0.39449541284403666,
+          "timeouts": 473,
+          "latency": {
+            "n": 726,
+            "min": 476.119,
+            "p50": 15807.617999999999,
+            "p95": 29132.66775,
+            "p99": 30297.675,
+            "max": 30543.654,
+            "mean": 15693.142303030296
+          },
+          "excess_p50": 15397.617999999999,
+          "excess_p95": 28722.66775,
+          "dispatch_lag_p99": 35.786558036925264,
+          "harness_saturated": true
+        }
+      ]
+    },
+    {
+      "workers": 64,
+      "levels": [
+        {
+          "concurrency": 1,
+          "target_rate": 2.4390243902439024,
+          "requests": 28,
+          "ok": 28,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 28,
+            "min": 420.855,
+            "p50": 432.03049999999996,
+            "p95": 571.7332499999998,
+            "p99": 645.6558000000001,
+            "max": 655.176,
+            "mean": 454.4685714285714
+          },
+          "excess_p50": 22.03049999999996,
+          "excess_p95": 161.73324999999977,
+          "dispatch_lag_p99": 2.302931923186407,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 2,
+          "target_rate": 4.878048780487805,
+          "requests": 52,
+          "ok": 52,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 52,
+            "min": 417.996,
+            "p50": 436.299,
+            "p95": 449.478,
+            "p99": 473.00182000000007,
+            "max": 488.311,
+            "mean": 437.06259615384624
+          },
+          "excess_p50": 26.298999999999978,
+          "excess_p95": 39.47800000000001,
+          "dispatch_lag_p99": 1.6034778667381036,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 5,
+          "target_rate": 12.195121951219512,
+          "requests": 126,
+          "ok": 126,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 126,
+            "min": 416.91,
+            "p50": 439.5115,
+            "p95": 452.03324999999995,
+            "p99": 465.30899999999997,
+            "max": 862.076,
+            "mean": 442.28232539682546
+          },
+          "excess_p50": 29.511500000000012,
+          "excess_p95": 42.03324999999995,
+          "dispatch_lag_p99": 2.2277143580140546,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 10,
+          "target_rate": 24.390243902439025,
+          "requests": 250,
+          "ok": 250,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 250,
+            "min": 414.653,
+            "p50": 433.2645,
+            "p95": 448.495,
+            "p99": 453.41663,
+            "max": 459.419,
+            "mean": 433.4307640000002
+          },
+          "excess_p50": 23.264499999999998,
+          "excess_p95": 38.495000000000005,
+          "dispatch_lag_p99": 2.4463091499637803,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 20,
+          "target_rate": 48.78048780487805,
+          "requests": 491,
+          "ok": 491,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 491,
+            "min": 414.701,
+            "p50": 428.158,
+            "p95": 446.8365,
+            "p99": 500.20310000000865,
+            "max": 861.761,
+            "mean": 433.8980264765791
+          },
+          "excess_p50": 18.158000000000015,
+          "excess_p95": 36.8365,
+          "dispatch_lag_p99": 2.5761147146113244,
+          "harness_saturated": false
+        },
+        {
+          "concurrency": 50,
+          "target_rate": 121.95121951219512,
+          "requests": 1199,
+          "ok": 1199,
+          "error_rate": 0.0,
+          "timeouts": 0,
+          "latency": {
+            "n": 1199,
+            "min": 413.525,
+            "p50": 423.188,
+            "p95": 837.0756,
+            "p99": 854.2182,
+            "max": 1277.958,
+            "mean": 452.42327856547087
+          },
+          "excess_p50": 13.187999999999988,
+          "excess_p95": 427.0756,
+          "dispatch_lag_p99": 4.218758845236151,
+          "harness_saturated": false
+        }
+      ]
+    }
+  ]
+}
